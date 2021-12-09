@@ -4,6 +4,7 @@ import pygame_widgets.button as btn
 
 from Snake.Game import run_snake
 from Tetris.Game import run_tetris
+from GoogleDino.Game import run_dino
 
 
 # Запаомнить!!! Экран игры создавать в функции!
@@ -35,7 +36,16 @@ button_tetris = btn.Button(
         margin=20, radius=20,
         onClick=run_tetris)
 
-BUTTONS = [button_snake, button_tetris]
+button_dino = btn.Button(
+        screen, 75, 275, 300, 150, text='Dino',
+        font=font_btn, fontSize=font_btn.get_ascent(),
+        inactiveColour=(255, 0, 255),
+        hoverColour=(200, 255, 0),
+        pressedColour=(200, 255, 0),
+        margin=20, radius=20,
+        onClick=run_dino)
+
+BUTTONS = [button_snake, button_tetris, button_dino]
 
 
 RUN = True
