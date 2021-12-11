@@ -13,9 +13,10 @@ def run_snake():
     clock = pygame.time.Clock()
     FPS = 60
 
-    font_score = pygame.font.Font('font_pixel.ttf', round(SIZE / 29.7))
-    font_end = pygame.font.Font('font_pixel.ttf', round(SIZE / 12.5))
-    # bg_img = pygame.image.load('bg.jpg').convert()
+    stay_bg = True
+    bg = pygame.image.load('bg/snake-space-bg.jpg')
+    font_score = pygame.font.Font('fonts/font_pixel.ttf', round(SIZE / 29.7))
+    font_end = pygame.font.Font('fonts/font_pixel.ttf', round(SIZE / 12.5))
 
     x, y = randrange(0, SIZE, CELL), randrange(0, SIZE, CELL)
     apple = randrange(0, SIZE, CELL), randrange(0, SIZE, CELL)
@@ -28,10 +29,15 @@ def run_snake():
 
     RUN = True
     while RUN:
-        screen.fill('black')
+        if stay_bg:
+            screen.blit(bg, (0, 0))
+        else:
+            screen.fill('black')
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 RUN = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_b:
+                stay_bg = not stay_bg
 
         # show score
         screen.blit(font_score.render(f'SCORE: {score}', False, "orange"), (15, 5))

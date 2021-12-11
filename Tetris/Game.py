@@ -19,8 +19,8 @@ def run_tetris():
     screen = pygame.Surface(SIZE)
     pygame.display.set_caption('Tetris')
 
-    title_font = pygame.font.Font('font_pixel.ttf', 65)
-    font = pygame.font.Font('font_pixel.ttf', 45)
+    title_font = pygame.font.Font('fonts/font_pixel.ttf', 65)
+    font = pygame.font.Font('fonts/font_pixel.ttf', 45)
     title_tetris = title_font.render('TETRIS', True, 'darkorange')
     title_score = font.render('score:', True, 'green')
     title_record = font.render('record:', True, 'purple')
@@ -173,17 +173,19 @@ def check_borders(cord):
 
 def get_best_record():
     try:
-        with open('record_best_all.txt') as f:
+        with open('record/record_tetris.txt') as f:
             return int(f.readline())
     except FileNotFoundError:
-        with open('record_best_all.txt', "w") as f:
+        with open('record/record_tetris.txt', "w") as f:
             f.write('0')
             return 0
 
 
 def save_best_record(record_, score_):
     rec = max(record_, score_)
-    with open('record_best_all.txt', "w") as f:
+    with open('record/record_tetris.txt', "w") as f:
+        f.write(str(rec))
+    with open('./record/record_tetris.txt', "w") as f:
         f.write(str(rec))
 
 
