@@ -1,6 +1,6 @@
 import pygame
+import sqlite3
 from random import randrange, choice
-import sys
 
 
 class Cactus:
@@ -18,7 +18,7 @@ class Cactus:
         self.size = size_plant[number]
         self.pos = [width + 35, flor]
 
-    def drive(self):
+    def update(self):
         if not n_win:
             self.pos[0] -= self.speed
 
@@ -88,12 +88,29 @@ def Make_Cactus():
 
 
 def Restart_Game():
-    global n_win, speed, isJump, pr_restart, y
+    global n_win, speed, isJump, pr_restart, y, attempts
     global cactus_time_game_out, cactus, JumpCount, score
 
     speed, y, cactus_time_game_out, JumpCount, score = copy_sp, floor - 44, 180, JK, 0
     n_win = pr_restart = False
+    attempts += 1
     cactus.clear()
+
+
+def save_record(path):
+    try:
+        connection = sqlite3.connect(path)
+        cursor = connection.cursor()
+        try:
+            cursor.execute(f"""INSERT INTO stat (`date`,attempts,hiscore,jumps)
+                               VALUES(datetime('now', '+3 hours'),{attempts},
+                               {max(high_score, score)},{total_jumps})""")
+            # print('Saved successfully')
+            connection.commit()
+        except Exception as e:
+            print('Save error...', e)
+    except Exception:
+        print('Connecting error...')
 
 
 def DrawWindow(screen):
@@ -115,7 +132,7 @@ def DrawWindow(screen):
         personage = dino[1]
 
     for cact in cactus:
-        cact.drive()
+        cact.update()
         screen.blit(cact.picture, cact.pos)
         if (x + 20) > cact.pos[0] or (x + 60) < (cact.pos[0] + cact.size[0]):
             cact.test_dead()
@@ -163,8 +180,10 @@ dino_low = False
 
 fps = 120
 speed = copy_sp = 360 // fps * 1
+attempts = 1
 
 anim = sc = 0
+total_jumps = 0
 floor = 158
 isJump = False
 JumpCount = JK = 40  # int(fps / 2.85)
@@ -186,10 +205,15 @@ pygame.display.set_caption("SUPER DINO GAME                 by  AndryMaster")
 RunGame = True
 
 
-def run_dino():
+def run_dino(private=False):
     global anim, click_delay, sc, score, isJump, JumpCount, dino_low, saw_score, cactus_time_game_out
-    global x, y, ob_x, ob_y, gr_x, gr_y, RunGame
+    global x, y, ob_x, ob_y, gr_x, gr_y, RunGame, total_jumps
     screen = pygame.display.set_mode((width, height))
+
+    if private:
+        db_path = 'record/dino_statics.db'
+    else:
+        db_path = 'GoogleDino/record/dino_statics.db'
 
     while RunGame:
         clock.tick(fps)
@@ -213,8 +237,8 @@ def run_dino():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                save_record(db_path)
                 RunGame = False
-                # sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and n_win:
                 pos = pygame.mouse.get_pos()
                 if width // 2 - 80 < pos[0] < width // 2 + 80 and height // 2 - 40 < pos[1] < height // 2 + 14:
@@ -224,11 +248,11 @@ def run_dino():
 
         if keys[pygame.QUIT] or keys[pygame.K_ESCAPE] or keys[pygame.K_q]:
             RunGame = False
-            # sys.exit()
 
         if not isJump:
             if (keys[pygame.K_UP] or keys[pygame.K_SPACE]) and not dino_low:
                 isJump = True
+                total_jumps += 1
         else:
             if JumpCount >= -JK:  # Прыжки
                 if JumpCount < 0:
@@ -240,7 +264,7 @@ def run_dino():
                 isJump = False
                 JumpCount = JK
 
-        if (keys[pygame.K_w] or keys[pygame.K_v]) and click_delay <= 0:
+        if keys[pygame.K_v] and click_delay <= 0:
             saw_score = not saw_score
             click_delay = 50
 
@@ -264,5 +288,5 @@ def run_dino():
 
 
 if __name__ == '__main__':
-    run_dino()
+    run_dino(private=True)
     pygame.quit()

@@ -20,7 +20,7 @@ screen = pygame.display.set_mode(SIZE)
 clock = pygame.time.Clock()
 FPS = 30
 
-font_btn = pygame.font.Font('fonts/font_pixel.ttf', 50)
+font_btn = pygame.font.SysFont('calibri', 60, bold=True)  # pygame.font.Font('fonts/font_pixel.ttf', 50)
 
 button_snake = btn.Button(
         screen, 75, 75, 300, 150, text='Snake',
@@ -64,6 +64,7 @@ BUTTONS = [button_snake, button_tetris, button_dino, button_tic_tac]
 RUN = True
 while RUN:
     screen = pygame.display.set_mode(SIZE)
+    pygame.display.set_caption('Game Land')
     # pygame.display.set_icon()
     screen.fill((200, 255, 230))  # Сюда картинку градиента
     events = pygame.event.get()

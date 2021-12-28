@@ -1,14 +1,14 @@
+import os
 import pygame
-from copy import deepcopy as copy
+from copy import deepcopy
 from random import choice, randint
 
 
 W, H = 10, 20
-CELL = 45
+CELL = 40
 SIZE = W * CELL, H * CELL
-SIZE_WINDOW = 750, 940
+SIZE_WINDOW = 700, 840
 BORDER_COLOR = (40, 40, 40)
-# FIGURE_COLORS = ['red', 'green', 'lightgreen', 'purple', 'yellow', 'lightblue', 'blue', 'orange', 'white']
 
 
 def run_tetris():
@@ -19,7 +19,7 @@ def run_tetris():
     screen = pygame.Surface(SIZE)
     pygame.display.set_caption('Tetris')
 
-    title_font = pygame.font.Font('fonts/font_pixel.ttf', 65)
+    title_font = pygame.font.Font('fonts/font_pixel.ttf', 60)
     font = pygame.font.Font('fonts/font_pixel.ttf', 45)
     title_tetris = title_font.render('TETRIS', True, 'darkorange')
     title_score = font.render('score:', True, 'green')
@@ -46,7 +46,7 @@ def run_tetris():
     anim_count, anim_speed, anim_limit = 0, 60, 2000
 
     color, next_color = random_color(), random_color()
-    figure, next_figure = copy(choice(figures)), copy(choice(figures))
+    figure, next_figure = deepcopy(choice(figures)), deepcopy(choice(figures))
 
     score = full_lines = 0
     score_lines = {0: 0, 1: 100, 2: 300, 3: 700, 4: 1500}
@@ -75,39 +75,40 @@ def run_tetris():
                     anim_limit = 160
                 elif event.key == pygame.K_UP:
                     rotate = True
+                elif event.key == pygame.K_d:
+                    save_best_record(0, 0, delete=True)
+                    record = 0
+        old_figure = deepcopy(figure)
 
         # move x
-        old_figure = copy(figure)
         for i in range(4):
             figure[i].x += dx
             if not check_borders(figure[i]):
-                figure = copy(old_figure)
+                figure = deepcopy(old_figure)
                 break
         # move y
         anim_count += anim_speed
         if anim_count > anim_limit:
             anim_count = 0
-            old_figure = copy(figure)
             for i in range(4):
                 figure[i].y += 1
                 if not check_borders(figure[i]):
                     for j in range(4):
                         board[old_figure[j].y][old_figure[j].x] = color
                     color, next_color = next_color, random_color()
-                    figure, next_figure = next_figure, copy(choice(figures))
+                    figure, next_figure = next_figure, deepcopy(choice(figures))
                     anim_limit = 2000
                     break
         # rotate figure
         if rotate:
             center = figure[0]
-            old_figure = copy(figure)
             for i in range(4):
                 x = figure[i].y - center.y
                 y = figure[i].x - center.x
                 figure[i].x = center.x - x
                 figure[i].y = center.y + y
                 if not check_borders(figure[i]):
-                    figure = copy(old_figure)
+                    figure = deepcopy(old_figure)
                     break
         # check lines
         line = H - 1
@@ -137,15 +138,15 @@ def run_tetris():
                     pygame.draw.rect(screen, col_or, figure_rect)
         # draw next figure
         for i in range(4):
-            figure_rect.x = next_figure[i].x * CELL + 380
-            figure_rect.y = next_figure[i].y * CELL + 185
+            figure_rect.x = next_figure[i].x * CELL + 360
+            figure_rect.y = next_figure[i].y * CELL + 200
             pygame.draw.rect(window_screen, next_color, figure_rect)
         # draw titles
-        window_screen.blit(title_tetris, (485, -10))
-        window_screen.blit(title_score, (535, 780))
-        window_screen.blit(font.render(str(score), True, 'white'), (550, 840))
-        window_screen.blit(title_record, (525, 650))
-        window_screen.blit(font.render(str(record), True, pygame.Color('gold')), (550, 710))
+        window_screen.blit(title_tetris, (445, -10))
+        window_screen.blit(title_score, (480, 660))
+        window_screen.blit(font.render(str(score), True, 'white'), (520, 730))
+        window_screen.blit(title_record, (480, 520))
+        window_screen.blit(font.render(str(record), True, pygame.Color('gold')), (520, 590))
         # over game
         for i in range(W):
             if board[0][i]:
@@ -173,20 +174,27 @@ def check_borders(cord):
 
 def get_best_record():
     try:
-        with open('record/record_tetris.txt') as f:
+        with open('Tetris/record/record_tetris.txt') as f:
             return int(f.readline())
     except FileNotFoundError:
-        with open('record/record_tetris.txt', "w") as f:
-            f.write('0')
-            return 0
+        try:
+            with open('record/record_tetris.txt') as f:
+                return int(f.readline())
+        except FileNotFoundError:
+            with open('record/record_tetris.txt', "w") as f:
+                f.write('0')
+                return 0
 
 
-def save_best_record(record_, score_):
+def save_best_record(record_, score_, delete=False):
     rec = max(record_, score_)
-    with open('record/record_tetris.txt', "w") as f:
-        f.write(str(rec))
-    with open('./record/record_tetris.txt', "w") as f:
-        f.write(str(rec))
+    rec = 0 if delete else rec
+    if os.path.isfile('Tetris/record/record_tetris.txt'):
+        with open('Tetris/record/record_tetris.txt', "w") as f:
+            f.write(str(rec))
+    else:
+        with open('record/record_tetris.txt', "w") as f:
+            f.write(str(rec))
 
 
 if __name__ == '__main__':
