@@ -8,10 +8,6 @@ from GoogleDino.Game import run_dino
 from TicTacToe.Game import run_tic_tac_toe
 
 
-# Запаомнить!!! Экран игры создавать в функции!
-# Надо сделать(добавить)!!!
-# 1. Поменять шрифт
-# 2. Главный экран с градиентом
 pygame.init()
 
 SIZE = width, height = (800, 600)

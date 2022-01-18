@@ -13,7 +13,7 @@ def run_snake():
     clock = pygame.time.Clock()
     FPS = 60
 
-    stay_bg = True
+    stay_bg = False
     bg = pygame.image.load('bg/snake-space-bg.jpg')
     font_score = pygame.font.Font('fonts/font_pixel.ttf', round(SIZE / 29.7))
     font_end = pygame.font.Font('fonts/font_pixel.ttf', round(SIZE / 12.5))
@@ -25,7 +25,7 @@ def run_snake():
     dx = dy = score = 0
     moved = True
 
-    anim_count, anim_speed = 0, 10
+    anim_count, anim_speed = 0, 100
 
     RUN = True
     while RUN:
@@ -52,10 +52,11 @@ def run_snake():
         if snake[-1] == apple:
             while apple in snake: apple = randrange(0, SIZE, CELL), randrange(0, SIZE, CELL)
             snake_length += 1
+            anim_speed -= 3
             score += 1
 
         # move
-        anim_count += 1
+        anim_count += 10
         if anim_count >= anim_speed:
             anim_count = 0
             x += dx * CELL
